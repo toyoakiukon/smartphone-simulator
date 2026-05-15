@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📱 スマホ料金シミュレーター 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f7fc;
+  --surface:#ffffff;
+  --surface2:#f0f2f8;
+  --border:#e2e6f0;
+  --border2:#d0d6e8;
+  --text:#1a1d2e;
+  --muted:#7a7f96;
+  --accent:#3a7af4;
+  --accent2:#6b4ef0;
+  --good:#12b878;
+  --warn:#e09400;
+  --danger:#e03a3a;
+  --docomo:#e63c23;
+  --au:#ea5504;
+  --softbank:#666666;
+  --rakuten:#cc2222;
+  --uq:#008040;
+  --ymobile:#cc0010;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:14px;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(58,122,244,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(58,122,244,.05) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+.container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:20px 16px 60px;}
+
+/* HEADER */
+.header{text-align:center;padding:32px 20px 24px;margin-bottom:24px;}
+.header-eyebrow{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;
+  color:var(--accent);text-transform:uppercase;margin-bottom:10px;
+  opacity:0;animation:fadeUp .6s .1s forwards;
+}
+.header h1{
+  font-family:'Bebas Neue',cursive;font-size:clamp(36px,8vw,64px);
+  letter-spacing:2px;line-height:1;color:var(--text);margin-bottom:6px;
+  opacity:0;animation:fadeUp .6s .2s forwards;
+}
+.header h1 span{color:var(--accent);}
+.header p{color:var(--muted);font-size:12px;opacity:0;animation:fadeUp .6s .3s forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* MODE TABS */
+.mode-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.mode-tab{
+  flex:1;padding:12px 8px;border:1px solid var(--border);border-radius:10px;
+  background:var(--surface);color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;text-align:center;transition:all .15s;font-family:'Noto Sans JP',sans-serif;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.mode-tab:hover{border-color:var(--accent);color:var(--text);}
+.mode-tab.active{
+  background:rgba(58,122,244,.08);border-color:var(--accent);color:var(--accent);
+}
+
+/* STEP CARD */
+.step-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:20px;margin-bottom:14px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);
+  opacity:0;animation:fadeUp .5s forwards;
+}
+.step-card:nth-child(1){animation-delay:.1s}
+.step-card:nth-child(2){animation-delay:.18s}
+.step-card:nth-child(3){animation-delay:.26s}
+.step-card:nth-child(4){animation-delay:.34s}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.step-num{
+  width:26px;height:26px;background:var(--accent);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#fff;flex-shrink:0;
+}
+.step-label{font-size:13px;font-weight:700;}
+.step-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+
+/* SLIDER */
+.slider-val{font-family:'Bebas Neue',cursive;font-size:38px;color:var(--text);line-height:1;margin-bottom:8px;}
+.slider-val span{font-size:16px;color:var(--muted);}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;background:var(--border2);border-radius:3px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;background:var(--accent);
+  border-radius:50%;box-shadow:0 0 0 4px rgba(58,122,244,.15);cursor:pointer;
+}
+.slider-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:6px;}
+
+/* TOGGLE GRID */
+.toggle-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(min-width:540px){.toggle-grid{grid-template-columns:repeat(3,1fr);}}
+.toggle-item{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:11px;cursor:pointer;transition:all .15s;user-select:none;
+}
+.toggle-item:hover{border-color:var(--accent);}
+.toggle-item.active{background:rgba(58,122,244,.08);border-color:var(--accent);}
+.toggle-item.active .ti-dot{background:var(--accent);}
+.ti-header{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.ti-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .15s;}
+.ti-name{font-size:11px;font-weight:700;}
+.ti-desc{font-size:9px;color:var(--muted);padding-left:15px;}
+
+/* CARD GRADE */
+.card-grade-wrap{margin-top:14px;display:none;}
+.card-grade-wrap.visible{display:block;}
+.card-grade-label{font-size:11px;color:var(--muted);margin-bottom:8px;}
+.card-grade-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.cg-btn{
+  padding:10px 6px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;
+  transition:all .15s;font-family:'Noto Sans JP',sans-serif;text-align:center;line-height:1.5;
+}
+.cg-btn:hover{border-color:var(--accent);color:var(--text);}
+.cg-btn.active-none{background:rgba(122,127,150,.08);border-color:var(--muted);color:var(--muted);}
+.cg-btn.active-normal{background:rgba(58,122,244,.08);border-color:var(--accent);color:var(--accent);}
+.cg-btn.active-gold{background:rgba(245,197,24,.1);border-color:#d4a800;color:#b08900;}
+.cg-icon{font-size:16px;display:block;margin-bottom:2px;}
+
+/* CALL OPTION */
+.call-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(min-width:500px){.call-option-grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:700px){.call-option-grid{grid-template-columns:repeat(5,1fr);}}
+.co-btn{
+  padding:10px 6px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;
+  transition:all .15s;font-family:'Noto Sans JP',sans-serif;text-align:center;line-height:1.5;
+}
+.co-btn:hover{border-color:var(--accent);color:var(--text);}
+.co-btn.co-active{background:rgba(58,122,244,.08);border-color:var(--accent);color:var(--accent);}
+.co-icon{font-size:16px;display:block;margin-bottom:2px;}
+.co-price{font-size:9px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;}
+.co-btn.co-active .co-price{color:rgba(58,122,244,.8);}
+
+/* FAM BTN */
+.fam-row{display:flex;gap:8px;flex-wrap:wrap;}
+.fam-btn{
+  padding:8px 14px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .15s;font-family:'Noto Sans JP',sans-serif;
+}
+.fam-btn:hover{border-color:var(--accent);color:var(--text);}
+.fam-btn.active{background:rgba(58,122,244,.08);border-color:var(--accent);color:var(--accent);}
+
+/* CALC BTN */
+.calc-btn{
+  width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;
+  cursor:pointer;margin:20px 0;font-family:'Noto Sans JP',sans-serif;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 4px 20px rgba(58,122,244,.25);
+}
+.calc-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(58,122,244,.35);}
+
+/* INDIVIDUAL MODE */
+#individual-mode{display:none;}
+
+/* LINE CARDS */
+.lines-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.lines-title{font-size:13px;font-weight:700;}
+.add-line-btn{
+  padding:7px 14px;background:rgba(58,122,244,.08);border:1px solid var(--accent);
+  border-radius:8px;color:var(--accent);font-size:11px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s;
+}
+.add-line-btn:hover{background:rgba(58,122,244,.14);}
+.line-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+.line-card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.line-num-badge{
+  width:24px;height:24px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-family:'DM Mono',monospace;font-size:11px;
+  color:#fff;font-weight:700;flex-shrink:0;
+}
+.line-name-input{
+  flex:1;background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;color:var(--text);font-size:12px;padding:6px 10px;
+  font-family:'Noto Sans JP',sans-serif;outline:none;
+}
+.line-name-input:focus{border-color:var(--accent);}
+.remove-line-btn{
+  padding:5px 10px;background:rgba(224,58,58,.07);border:1px solid rgba(224,58,58,.25);
+  border-radius:7px;color:var(--danger);font-size:11px;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;transition:all .15s;
+}
+.remove-line-btn:hover{background:rgba(224,58,58,.14);}
+.line-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(min-width:600px){.line-fields{grid-template-columns:repeat(3,1fr);}}
+.field-group{display:flex;flex-direction:column;gap:5px;}
+.field-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;}
+.field-select{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-size:11px;padding:8px 10px;font-family:'Noto Sans JP',sans-serif;
+  outline:none;cursor:pointer;width:100%;
+}
+.field-select:focus{border-color:var(--accent);}
+.field-select option{background:var(--surface);}
+.line-discounts{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.disc-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-bottom:8px;}
+.disc-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.disc-chip{
+  padding:5px 10px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;
+  transition:all .15s;color:var(--muted);user-select:none;
+}
+.disc-chip:hover{border-color:var(--accent);}
+.disc-chip.active{background:rgba(18,184,120,.08);border-color:var(--good);color:var(--good);}
+
+/* RESULTS */
+#results{display:none;}
+#results.show{display:block;}
+.results-header{text-align:center;padding:18px 0 14px;}
+.results-header h2{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;color:var(--text);margin-bottom:4px;}
+.results-header p{font-size:11px;color:var(--muted);}
+
+/* INDIVIDUAL RESULTS */
+.ind-result-summary{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);
+}
+.ind-total-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.ind-total-label{font-size:12px;color:var(--muted);}
+.ind-total-price{font-family:'Bebas Neue',cursive;font-size:36px;color:var(--text);}
+.ind-total-unit{font-size:14px;color:var(--muted);}
+.ind-line-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--border);
+}
+.ind-line-row:last-child{border-bottom:none;}
+.ind-line-name{font-size:12px;color:var(--text);}
+.ind-line-carrier{font-size:10px;color:var(--muted);margin-top:1px;}
+.ind-line-price{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--text);}
+
+/* RANK CARDS */
+.rank-list{display:flex;flex-direction:column;gap:10px;}
+.rank-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.rank-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,0,0,.015),transparent);pointer-events:none;
+}
+.rank-card:hover{transform:translateX(4px);box-shadow:0 4px 18px rgba(0,0,0,.1);}
+.rank-card.rank-1{border-left:3px solid #c8960a;}
+.rank-card.rank-2{border-left:3px solid #8a94a8;}
+.rank-card.rank-3{border-left:3px solid #a0632a;}
+.rank-card.rank-other{border-left:3px solid var(--border2);}
+.rank-card.rank-1 .rank-badge{color:#c8960a;}
+.rank-card.rank-2 .rank-badge{color:#8a94a8;}
+.rank-card.rank-3 .rank-badge{color:#a0632a;}
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.rank-badge{font-family:'Bebas Neue',cursive;font-size:20px;min-width:26px;color:var(--muted);}
+.carrier-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.carrier-label{font-size:13px;font-weight:700;letter-spacing:.3px;}
+.plan-name{font-size:12px;color:var(--muted);margin-top:2px;}
+.price-display{margin-left:auto;text-align:right;}
+.price-big{font-family:'Bebas Neue',cursive;font-size:30px;line-height:1;color:var(--text);}
+.price-unit{font-size:12px;color:var(--muted);}
+.price-vs{font-size:10px;color:var(--muted);margin-top:1px;}
+.bar-wrap{margin-bottom:8px;}
+.bar-track{height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.16,1,.3,1);width:0%;}
+.breakdown{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.rank-card.open .breakdown{display:block;}
+.bd-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;}
+.bd-label{color:var(--muted);}
+.bd-val{font-family:'DM Mono',monospace;color:var(--text);}
+.bd-val.discount{color:var(--good);}
+.bd-val.extra{color:var(--warn);}
+.bd-total{
+  display:flex;justify-content:space-between;font-size:13px;font-weight:700;
+  padding:7px 0 0;border-top:1px solid var(--border);margin-top:5px;
+}
+.bd-total .bd-val{color:var(--text);font-size:14px;}
+.expand-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:5px;}
+.rank-card.open .expand-hint{display:none;}
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;}
+.badge-gold{background:rgba(200,150,10,.12);color:#a07800;}
+.badge-green{background:rgba(18,184,120,.1);color:var(--good);}
+.badge-blue{background:rgba(58,122,244,.1);color:var(--accent);}
+.notice{
+  background:rgba(58,122,244,.05);border:1px solid rgba(58,122,244,.15);
+  border-radius:10px;padding:12px 16px;font-size:11px;color:var(--muted);
+  line-height:1.9;margin-top:18px;
+}
+.notice strong{color:var(--text);}
+.info-box{margin-top:10px;font-size:10px;color:var(--muted);line-height:1.9;display:none;}
+::-webkit-scrollbar{height:5px;width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="header-eyebrow">Japan Mobile Plan · 2026</div>
+  <h1>スマホ<span>料金</span><br>シミュレーター</h1>
+  <p>条件を選ぶだけで6キャリアの月額を自動計算・ランキング表示</p>
+</div>
+
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tab-batch" onclick="switchMode('batch')">
+    📊 一括比較モード<br><span style="font-size:10px;font-weight:400;color:var(--muted)">同条件で全プランを比較</span>
+  </button>
+  <button class="mode-tab" id="tab-individual" onclick="switchMode('individual')">
+    👥 回線別モード<br><span style="font-size:10px;font-weight:400;color:var(--muted)">回線ごとにプランを選択</span>
+  </button>
+</div>
+
+<!-- ═══════ BATCH MODE ═══════ -->
+<div id="batch-mode">
+
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">01</div><div><div class="step-label">毎月のデータ使用量</div><div class="step-sub">Wi-Fiを除いたモバイルデータの目安</div></div></div>
+    <div class="slider-val" id="gb-display">5<span>GB</span></div>
+    <input type="range" id="gb-slider" min="0" max="50" value="5" step="1" oninput="updateGB(this.value)">
+    <div class="slider-labels"><span>0GB</span><span>10GB</span><span>20GB</span><span>30GB</span><span>50GB+</span></div>
+  </div>
+
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">02</div><div><div class="step-label">割引の適用条件</div><div class="step-sub">該当するものをすべて選択</div></div></div>
+    <div class="toggle-grid">
+      <div class="toggle-item" id="t-hikari" onclick="toggleCond('hikari')"><div class="ti-header"><div class="ti-dot"></div><div class="ti-name">光回線あり</div></div><div class="ti-desc">ドコモ光・auひかり<br>SoftBank光/Air等</div></div>
+      <div class="toggle-item" id="t-family" onclick="toggleCond('family')"><div class="ti-header"><div class="ti-dot"></div><div class="ti-name">家族割（2回線）</div></div><div class="ti-desc">同キャリアで2回線</div></div>
+      <div class="toggle-item" id="t-family3" onclick="toggleCond('family3')"><div class="ti-header"><div class="ti-dot"></div><div class="ti-name">家族割（3回線以上）</div></div><div class="ti-desc">割引が最大になる<br>3回線以上のグループ</div></div>
+      <div class="toggle-item" id="t-denki" onclick="toggleCond('denki')"><div class="ti-header"><div class="ti-dot"></div><div class="ti-name">でんきセット</div></div><div class="ti-desc">ドコモでんき・auでんき等<br>UQは自宅セット割対象</div></div>
+      <div class="toggle-item" id="t-child" onclick="toggleCond('child')"><div class="ti-header"><div class="ti-dot"></div><div class="ti-name">子ども割対象</div></div><div class="ti-desc">12〜18歳以下の<br>回線が含まれる</div></div>
+    </div>
+    <div class="card-grade-wrap visible" id="card-grade-wrap">
+      <div class="card-grade-label">💳 カードの種類</div>
+      <div class="card-grade-row">
+        <button class="cg-btn active-none" id="cg-none" onclick="setCardGrade('none')"><span class="cg-icon">🚫</span>なし</button>
+        <button class="cg-btn" id="cg-normal" onclick="setCardGrade('normal')"><span class="cg-icon">💳</span>ノーマル</button>
+        <button class="cg-btn" id="cg-gold" onclick="setCardGrade('gold')"><span class="cg-icon">✨</span>ゴールド</button>
+      </div>
+      <div id="card-info" class="info-box"></div>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">03</div><div><div class="step-label">通話オプション</div><div class="step-sub">月額に加算（プラン込みの場合は自動で0円）</div></div></div>
+    <div class="call-option-grid">
+      <button class="co-btn co-active" id="co-none" onclick="setCallOpt('none')"><span class="co-icon">📵</span>なし<div class="co-price">従量制</div></button>
+      <button class="co-btn" id="co-short" onclick="setCallOpt('short')"><span class="co-icon">📞</span>5〜10分<div class="co-price">+880円/月</div></button>
+      <button class="co-btn" id="co-unlimited" onclick="setCallOpt('unlimited')"><span class="co-icon">☎️</span>完全かけ放題<div class="co-price">+1,980円/月</div></button>
+      <button class="co-btn" id="co-pack60" onclick="setCallOpt('pack60')"><span class="co-icon">⏱️</span>月60分パック<div class="co-price">UQのみ +660円</div></button>
+      <button class="co-btn" id="co-link" onclick="setCallOpt('link')"><span class="co-icon">🔗</span>Rakuten Link<div class="co-price">楽天のみ 0円</div></button>
+    </div>
+    <div id="call-info" class="info-box"></div>
+  </div>
+
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">04</div><div><div class="step-label">回線数</div><div class="step-sub">世帯合計で計算</div></div></div>
+    <div class="fam-row">
+      <button class="fam-btn active" onclick="setLines(1,this)">1人</button>
+      <button class="fam-btn" onclick="setLines(2,this)">2人</button>
+      <button class="fam-btn" onclick="setLines(3,this)">3人</button>
+      <button class="fam-btn" onclick="setLines(4,this)">4人</button>
+      <button class="fam-btn" onclick="setLines(5,this)">5人</button>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcBatch()">📊 シミュレーションする</button>
+</div>
+
+<!-- ═══════ INDIVIDUAL MODE ═══════ -->
+<div id="individual-mode">
+  <div class="lines-header">
+    <div class="lines-title">📱 回線の設定</div>
+    <button class="add-line-btn" onclick="addLine()">＋ 回線を追加</button>
+  </div>
+  <div id="lines-container"></div>
+  <button class="calc-btn" onclick="calcIndividual()">📊 合計を計算する</button>
+</div>
+
+<!-- ═══════ RESULTS ═══════ -->
+<div id="results">
+  <div class="results-header">
+    <h2 id="result-title">📊 料金ランキング</h2>
+    <p id="result-subtitle"></p>
+  </div>
+  <div id="result-body"></div>
+  <div class="notice">
+    <strong>⚠️ 注意事項</strong><br>
+    • 料金はすべて<strong>税込</strong>。端末代・ユニバーサルサービス料・通話料は含みません。<br>
+    • <strong>SoftBank / Y!mobile</strong>：2026年6〜7月より値上げ予定（改定後の料金を使用）。<br>
+    • UQ/Y!mobileの光セット割と家族割は排他のため自動で有利な方を選択。<br>
+    • 実際の料金は各社公式サイトでご確認ください。
+  </div>
+</div>
+
+</div><!-- /container -->
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const CARRIER_COLORS = {
+  docomo:'#e63c23', au:'#ea5504', softbank:'#555555',
+  rakuten:'#cc2222', uq:'#008040', ymobile:'#cc0010'
+};
+const CARRIER_NAMES = {
+  docomo:'docomo', au:'au', softbank:'SoftBank',
+  rakuten:'楽天モバイル', uq:'UQモバイル', ymobile:'Y!mobile'
+};
+
+const CALL_COSTS = {
+  docomo:   {short:880,  unlimited:1980, shortName:'5分通話無料オプション',       unlimitedName:'かけ放題オプション'},
+  au:       {short:880,  unlimited:1980, shortName:'通話定額ライト2（5分）',       unlimitedName:'通話定額2（完全）'},
+  softbank: {short:880,  unlimited:1980, shortName:'準定額オプション＋（5分）',    unlimitedName:'定額オプション＋（完全）'},
+  rakuten:  {short:1100, unlimited:1100, shortName:'15分通話かけ放題（標準）',     unlimitedName:'15分通話かけ放題（標準）'},
+  uq:       {short:880,  unlimited:1980, shortName:'通話放題ライト（10分）',       unlimitedName:'通話放題（完全）'},
+  ymobile:  {short:880,  unlimited:1980, shortName:'だれとでも定額＋（10分）',     unlimitedName:'スーパーだれとでも定額＋'},
+};
+const CALL_INC_SHORT = new Set(['コミコミプランバリュー','シンプル3 L','ahamo','ahamo 大盛り']);
+const CALL_INC_UNLIM = new Set([]);
+const AHAMO_PLANS    = new Set(['ahamo','ahamo 大盛り']);
+
+function getCallCost(plan, opt) {
+  if(opt==='none') return {name:null,amt:0};
+  const c = CALL_COSTS[plan.carrier];
+  if(!c) return {name:null,amt:0};
+  if(opt==='link') {
+    if(plan.carrier==='rakuten') return {name:'Rakuten Link（無料）',amt:0};
+    return {name:c.unlimitedName,amt:c.unlimited};
+  }
+  if(opt==='pack60') {
+    if(plan.carrier==='uq') return {name:'通話パック60（60分/月）',amt:660};
+    return {name:c.shortName,amt:c.short};
+  }
+  if(opt==='short') {
+    if(CALL_INC_SHORT.has(plan.name)) return {name:`${c.shortName}（${plan.name}込み）`,amt:0};
+    return {name:c.shortName,amt:c.short};
+  }
+  if(opt==='unlimited') {
+    if(CALL_INC_UNLIM.has(plan.name)) return {name:'完全かけ放題（込み）',amt:0};
+    if(AHAMO_PLANS.has(plan.name))    return {name:'かけ放題オプション（ahamo）',amt:1100};
+    if(CALL_INC_SHORT.has(plan.name)) {
+      const diff = c.unlimited - c.short;
+      return {name:`${c.unlimitedName}（差額）`,amt:Math.max(diff,0)};
+    }
+    return {name:c.unlimitedName,amt:c.unlimited};
+  }
+  return {name:null,amt:0};
+}
+
+const PLANS = [
+  // ════ docomo ════
+  // ドコモ MAX: 2025年6月5日〜 段階制（〜1GB/〜3GB/無制限）
+  {carrier:'docomo', name:'ドコモ MAX', label:'〜1GB/〜3GB/無制限 段階制',
+   desc:'〜1GB:5,698円 / 〜3GB:6,798円 / 無制限:8,448円 / DAZN・NBA docomo等付帯',
+   baseCalc:gb=>gb<=1?5698:gb<=3?6798:8448, maxGB:999,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'みんなドコモ割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'みんなドコモ割（2回線）',a:550});
+     if(s.hikari) d.push({n:'ドコモ光セット割',a:1210});
+     if(s.cardGrade==='normal') d.push({n:'dカードお支払割',a:220});
+     else if(s.cardGrade==='gold') d.push({n:'dカード GOLD/PLATINUM お支払割',a:550});
+     if(s.denki&&!s.hikari) d.push({n:'ドコモでんきセット割',a:110});
+     return d;},
+   tags:['段階制','DAZN付帯','海外30GB']},
+
+  // ドコモ mini: 2025年6月5日〜 4GB/10GBの2択 みんなドコモ割対象外
+  {carrier:'docomo', name:'ドコモ mini', label:'4GB / 10GB',
+   desc:'4GB:2,750円 / 10GB:3,850円 ※みんなドコモ割対象外',
+   baseCalc:gb=>gb<=4?2750:gb<=10?3850:null, maxGB:10,
+   discounts:s=>{let d=[];
+     // みんなドコモ割はドコモ miniに適用不可
+     if(s.hikari) d.push({n:'ドコモ光セット割',a:1210});
+     if(s.cardGrade==='normal') d.push({n:'dカードお支払割',a:220});
+     else if(s.cardGrade==='gold') d.push({n:'dカード GOLD/PLATINUM お支払割',a:550});
+     if(s.denki&&!s.hikari) d.push({n:'ドコモでんきセット割',a:110});
+     return d;},
+   tags:['小容量','家族割なし']},
+
+  {carrier:'docomo', name:'ahamo', label:'30GB / 海外91カ国込み',
+   desc:'30GB・5分通話無料込み / 2,970円 ※割引なし',
+   base:2970, maxGB:30, discounts:()=>[], tags:['30GB','海外込み','5分通話込']},
+
+  {carrier:'docomo', name:'ahamo 大盛り', label:'110GB / 海外91カ国込み',
+   desc:'110GB・5分通話無料込み / 4,950円（大盛りOP+1,980円込み）※割引なし',
+   base:4950, maxGB:110, discounts:()=>[], tags:['110GB','海外込み','5分通話込']},
+
+  // ════ au ════
+  {carrier:'au', name:'使い放題MAX＋ 5G', label:'無制限 / 1GB以下で自動割引',
+   desc:'データ無制限 / 7,788円 / 1GB以下でさらに−1,650円',
+   base:7788, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'家族割プラス（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'家族割プラス（2回線）',a:660});
+     if(s.hikari) d.push({n:'auスマートバリュー',a:1100});
+     if(s.cardGrade==='normal'||s.cardGrade==='gold') d.push({n:'au PAYカードお支払割',a:220});
+     if(s.gb<=1) d.push({n:'1GB以下自動割引',a:1650});
+     return d;},
+   tags:['無制限','1GB割引']},
+
+  {carrier:'au', name:'auバリューリンクプラン', label:'無制限 / 1GB以下で自動割引',
+   desc:'無制限:8,008円 / 1GB以下でさらに−1,650円 / 最大割引後5,478円・1GB以下3,828円',
+   base:8008, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'家族割プラス（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'家族割プラス（2回線）',a:660});
+     if(s.hikari) d.push({n:'auスマートバリュー',a:1100});
+     if(s.cardGrade==='normal'||s.cardGrade==='gold') d.push({n:'au PAYカードお支払割',a:220});
+     if(s.gb<=1) d.push({n:'1GB以下自動割引',a:1650});
+     return d;},
+   tags:['無制限','1GB割引']},
+
+  {carrier:'au', name:'auバリューリンクプラン マネ活2', label:'無制限 / ポイント還元特化',
+   desc:'9,328円 / au PAYカード+auじぶん銀行でポイント大量還元 / 実質4,000円台も',
+   base:9328, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'家族割プラス（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'家族割プラス（2回線）',a:660});
+     if(s.hikari) d.push({n:'auスマートバリュー',a:1100});
+     if(s.cardGrade==='normal'||s.cardGrade==='gold') d.push({n:'au PAYカードお支払割',a:220});
+     if(s.gb<=1) d.push({n:'1GB以下自動割引',a:1650});
+     return d;},
+   tags:['無制限','マネ活','ポイント還元']},
+
+  {carrier:'au', name:'スマホミニプラン+', label:'〜5GB 段階制',
+   desc:'〜1GB:4,928円 / 1〜3GB:6,578円 / 3〜5GB:8,228円 / 最大割引後 〜1GB:2,398円〜',
+   baseCalc:gb=>gb<=1?4928:gb<=3?6578:gb<=5?8228:null, maxGB:5,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'家族割プラス（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'家族割プラス（2回線）',a:660});
+     if(s.hikari) d.push({n:'auスマートバリュー',a:1100});
+     if(s.cardGrade==='normal'||s.cardGrade==='gold') d.push({n:'au PAYカードお支払割',a:220});
+     return d;},
+   tags:['小容量','段階制']},
+
+  // ════ SoftBank ════
+  {carrier:'softbank', name:'メリハリ無制限＋', label:'無制限',
+   desc:'データ無制限 / 7,425円（7月より+550円改定予定）',
+   base:7425, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
+     return d;},
+   tags:['無制限']},
+
+  {carrier:'softbank', name:'ペイトク無制限', label:'無制限 / PayPay特化',
+   desc:'データ無制限・PayPayポイント還元強化 / 9,625円',
+   base:9625, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
+     return d;},
+   tags:['無制限','PayPay最大+5%']},
+
+  {carrier:'softbank', name:'ペイトク50', label:'50GB / PayPay特化',
+   desc:'50GB・PayPayポイント還元強化 / 8,525円',
+   base:8525, maxGB:50,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
+     return d;},
+   tags:['50GB','PayPay最大+3%']},
+
+  {carrier:'softbank', name:'ペイトク30', label:'30GB / PayPay特化',
+   desc:'30GB・PayPayポイント還元強化 / 7,425円',
+   base:7425, maxGB:30,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
+     return d;},
+   tags:['30GB','PayPay最大+1%']},
+
+  // ════ 楽天モバイル ════
+  {carrier:'rakuten', name:'Rakuten最強プラン', label:'〜3GB / 3〜20GB / 無制限 従量制',
+   desc:'3GB:1,078円 / 20GB:2,178円 / 無制限:3,278円 / Rakuten Link通話無料',
+   baseCalc:gb=>gb<=3?1078:gb<=20?2178:3278, maxGB:999,
+   discounts:s=>{let d=[];
+     if(s.family||s.family3) d.push({n:'最強家族割（1回線あたり）',a:110});
+     if(s.child) d.push({n:'最強こども割（12歳以下）',a:s.gb<=3?440:110});
+     return d;},
+   tags:['従量制','通話無料','楽天SPU']},
+
+  // ════ UQモバイル ════
+  {carrier:'uq', name:'コミコミプランバリュー', label:'35GB / 10分かけ放題込み',
+   desc:'35GB・10分かけ放題・Pontaパス込み / 3,828円 ※家族割・セット割・カード割なし',
+   base:3828, maxGB:35, discounts:()=>[], tags:['35GB','10分通話込','Pontaパス']},
+
+  {carrier:'uq', name:'トクトクプラン2', label:'30GB / 5GB以下で自動割引',
+   desc:'30GB:4,048円 / 5GB以下は2,948円に自動割引 / データくりこし対応',
+   baseCalc:()=>4048, maxGB:30,
+   discounts:s=>{let d=[];
+     // 自宅セット割：光回線 または でんき契約で適用（どちらも同額・併用不可）
+     // 家族セット割とも排他で、自宅セット割が優先・有利
+     if(s.hikari||s.denki) {
+       const label = s.hikari ? '自宅セット割（インターネットコース）' : '自宅セット割（でんきコース）';
+       d.push({n:label, a:1100});
+     } else if(s.family||s.family3) {
+       d.push({n:'家族セット割（回線数問わず）',a:550});
+     }
+     if(s.cardGrade==='normal'||s.cardGrade==='gold') d.push({n:'au PAYカードお支払割',a:220});
+     if(s.gb<=5) d.push({n:'5GB以下自動割引',a:1100});
+     if(s.child) d.push({n:'UQ親子応援割',a:1650});
+     return d;},
+   tags:['30GB','くりこし','5GB割引']},
+
+  // ════ Y!mobile ════
+  {carrier:'ymobile', name:'シンプル3 S', label:'5GB',
+   desc:'5GB / 3,278円（6/2〜）※おうち割非対象',
+   base:3278, maxGB:5,
+   discounts:s=>{let d=[];
+     if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     return d;},
+   tags:['5GB','くりこし']},
+
+  {carrier:'ymobile', name:'シンプル3 M', label:'30GB',
+   desc:'30GB / 4,378円（6/2〜）/ データくりこし対応',
+   base:4378, maxGB:30,
+   discounts:s=>{let d=[];
+     const hA=s.hikari?1650:0, fA=(s.family||s.family3)?1100:0;
+     if(s.hikari&&hA>=fA) d.push({n:'おうち割 光セット（A）',a:1650});
+     else if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     if(s.child) d.push({n:'ワイモバ親子割',a:1100});
+     return d;},
+   tags:['30GB','くりこし']},
+
+  {carrier:'ymobile', name:'シンプル3 L', label:'35GB / 10分かけ放題込み',
+   desc:'35GB・10分かけ放題込み / 5,478円（6/2〜）/ データくりこし対応',
+   base:5478, maxGB:35,
+   discounts:s=>{let d=[];
+     const hA=s.hikari?1650:0, fA=(s.family||s.family3)?1100:0;
+     if(s.hikari&&hA>=fA) d.push({n:'おうち割 光セット（A）',a:1650});
+     else if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     if(s.child) d.push({n:'ワイモバ親子割',a:1100});
+     return d;},
+   tags:['35GB','10分通話込','くりこし']},
+];
+
+const PLAN_MAP = {};
+PLANS.forEach(p => { PLAN_MAP[p.name] = p; });
+
+const DISC_OPTIONS = [
+  {key:'hikari',  label:'光回線セット',     desc:'ドコモ光/auひかり/SB光等'},
+  {key:'family',  label:'家族割（2回線）',  desc:'2回線グループ'},
+  {key:'family3', label:'家族割（3回線以上）', desc:'割引最大'},
+  {key:'denki',   label:'でんきセット',     desc:'各社でんき契約'},
+  {key:'child',   label:'子ども割',         desc:'12〜18歳以下含む'},
+];
+
+// ═══════════════════════════════════════════════
+// BATCH MODE STATE
+// ═══════════════════════════════════════════════
+const batchState = {
+  gb:5, hikari:false, family:false, family3:false,
+  cardGrade:'none', denki:false, child:false,
+  callOpt:'none', lines:1
+};
+
+function updateGB(v) {
+  batchState.gb = parseInt(v);
+  document.getElementById('gb-display').innerHTML =
+    parseInt(v) >= 50 ? '50<span>GB+</span>' : v + '<span>GB</span>';
+}
+
+function toggleCond(k) {
+  batchState[k] = !batchState[k];
+  document.getElementById('t-' + k).classList.toggle('active', batchState[k]);
+  if(k === 'family3' && batchState.family3 && !batchState.family) {
+    batchState.family = true;
+    document.getElementById('t-family').classList.add('active');
+  }
+}
+
+function setCardGrade(g) {
+  batchState.cardGrade = g;
+  ['none','normal','gold'].forEach(x => {
+    const b = document.getElementById('cg-' + x);
+    b.className = 'cg-btn' + (g === x ? ' active-' + x : '');
+  });
+  const info = document.getElementById('card-info');
+  const nm = '<strong style="color:#1a1d2e">';
+  const gd = '<strong style="color:#a07800">';
+  const e  = '</strong>';
+  const maps = {
+    none: '',
+    normal: [
+      '📌 ノーマルカードの割引額',
+      `docomo: dカード → ${nm}▲220円${e} / GOLD・PLATINUM → ${gd}▲550円${e}（ドコモMAX・mini対象、ahamo対象外）`,
+      `au: au PAYカード → ${nm}▲220円${e}`,
+      `SoftBank: PayPayカード → ${nm}▲187円${e}`,
+      `UQモバイル: au PAYカード → ${nm}▲220円${e}（トクトクプラン2のみ）`,
+      `Y!mobile: PayPayカード → ${nm}▲330円${e}（シンプル3）`,
+      '楽天: ポイント還元型（直接割引なし）',
+    ].join('<br>'),
+    gold: [
+      '✨ ゴールドカードの割引額',
+      `docomo: dカード GOLD/GOLD U/PLATINUM → ${gd}▲550円${e}（ドコモMAX・mini対象、ahamo対象外）`,
+      `au: au PAYゴールドカード → ${nm}▲220円${e}（ノーマルと同額）`,
+      `SoftBank: PayPayカードゴールド → ${nm}▲187円${e}（ノーマルと同額）`,
+      `UQモバイル: au PAYゴールド → ${nm}▲220円${e}（ノーマルと同額）`,
+      `Y!mobile: PayPayカードゴールド → ${gd}▲550円${e}（ノーマル+220円お得）`,
+      '楽天: ポイント還元型（直接割引なし）',
+    ].join('<br>'),
+  };
+  if(g === 'none') { info.style.display = 'none'; info.innerHTML = ''; }
+  else { info.style.display = 'block'; info.innerHTML = maps[g] || ''; }
+}
+
+function setCallOpt(o) {
+  batchState.callOpt = o;
+  ['none','short','unlimited','pack60','link'].forEach(x => {
+    document.getElementById('co-' + x).classList.toggle('co-active', x === o);
+  });
+  const info = document.getElementById('call-info');
+  const G    = v => `<strong style="color:#1a1d2e">${v}</strong>`;
+  const FREE = '<strong style="color:#12b878">0円（込み）</strong>';
+  const maps = {
+    none: '',
+    short: [
+      '📌 5〜10分かけ放題 各社料金',
+      `docomo ▶ 5分通話無料オプション ${G('+880円')}　※ahamo は${FREE}`,
+      `au ▶ 通話定額ライト2（5分） ${G('+880円')}`,
+      `SoftBank ▶ 準定額オプション＋（5分） ${G('+880円')}`,
+      `楽天 ▶ 15分通話かけ放題 ${G('+1,100円')}　※Rakuten Linkなら0円`,
+      `UQモバイル ▶ 通話放題ライト（10分） ${G('+880円')}　※コミコミPVは${FREE}`,
+      `Y!mobile ▶ だれとでも定額＋（10分） ${G('+880円')}　※シンプル3 Lは${FREE}`,
+    ].join('<br>'),
+    unlimited: [
+      '📌 完全かけ放題 各社料金',
+      `docomo ▶ かけ放題オプション ${G('+1,980円')}　※ahamo は${G('+1,100円')}`,
+      `au ▶ 通話定額2 ${G('+1,980円')}`,
+      `SoftBank ▶ 定額オプション＋ ${G('+1,980円')}`,
+      '楽天 ▶ Rakuten Linkで無料（完全かけ放題オプション別途なし）',
+      `UQモバイル ▶ 通話放題 ${G('+1,980円')}　※コミコミPVは+1,100円`,
+      `Y!mobile ▶ スーパーだれとでも定額＋ ${G('+1,980円')}　※シンプル3 Lは+1,100円`,
+    ].join('<br>'),
+    pack60: [
+      '📌 月60分パック（UQモバイル限定）',
+      `UQモバイル ▶ 通話パック60 ${G('+660円')}`,
+      '他キャリアには同等プランがないため、5〜10分かけ放題として計算します。',
+    ].join('<br>'),
+    link: [
+      '📌 Rakuten Link（楽天モバイル限定）',
+      '楽天 ▶ Rakuten Linkアプリ経由の国内通話 <strong style="color:#12b878">0円</strong>',
+      '他キャリアはRakuten Linkが使えないため、完全かけ放題として計算します。',
+    ].join('<br>'),
+  };
+  if(o === 'none') { info.style.display = 'none'; info.innerHTML = ''; }
+  else { info.style.display = 'block'; info.innerHTML = maps[o] || ''; }
+}
+
+function setLines(n, btn) {
+  batchState.lines = n;
+  document.querySelectorAll('.fam-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if(n >= 2 && !batchState.family)  { batchState.family = true;  document.getElementById('t-family').classList.add('active'); }
+  if(n >= 3 && !batchState.family3) { batchState.family3 = true; document.getElementById('t-family3').classList.add('active'); }
+}
+
+// ── BATCH CALC ─────────────────────────────────
+function calcBatch() {
+  const s = { ...batchState };
+  const results = [];
+  PLANS.forEach(plan => {
+    if(plan.maxGB > 0 && s.gb > plan.maxGB) return;
+    let base = plan.baseCalc ? plan.baseCalc(s.gb) : plan.base;
+    if(base === null || base === undefined) return;
+    const discList  = plan.discounts(s);
+    const totalDisc = discList.reduce((x, d) => x + d.a, 0);
+    const baseAfter = Math.max(base - totalDisc, 0);
+    const callCost  = getCallCost(plan, s.callOpt);
+    const perLine   = baseAfter + callCost.amt;
+    const monthly   = perLine * s.lines;
+    results.push({ plan, base, discList, callCost, perLine, monthly });
+  });
+  results.sort((a, b) => a.monthly - b.monthly);
+
+  const parts = [];
+  if(s.hikari) parts.push('光回線');
+  if(s.family3) parts.push('家族3回線以上');
+  else if(s.family) parts.push('家族2回線');
+  if(s.cardGrade === 'gold') parts.push('ゴールドカード');
+  else if(s.cardGrade === 'normal') parts.push('カード払い');
+  if(s.denki) parts.push('でんき');
+  if(s.child) parts.push('子ども割');
+  const callLbl = { short:'5〜10分かけ放題', unlimited:'完全かけ放題', pack60:'月60分パック', link:'Rakuten Link' };
+  if(s.callOpt !== 'none') parts.push(callLbl[s.callOpt]);
+
+  document.getElementById('result-title').textContent    = '📊 料金ランキング';
+  document.getElementById('result-subtitle').textContent =
+    `${s.gb >= 50 ? '無制限' : s.gb + 'GB'} / ${parts.length ? parts.join('・') : '割引なし'}${s.lines > 1 ? ' / ' + s.lines + '回線合計' : ''}`;
+
+  renderBatchResults(results);
+}
+
+function renderBatchResults(results) {
+  const cheapest = results[0].monthly;
+  const el = document.getElementById('result-body');
+  el.innerHTML = '<div class="rank-list" id="rank-list-inner"></div>';
+  const list = document.getElementById('rank-list-inner');
+
+  results.forEach((r, i) => {
+    const rank      = i + 1;
+    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+    const emoji     = ['🥇','🥈','🥉'][i] || `${rank}`;
+    const diff      = r.monthly - cheapest;
+    const diffStr   = diff === 0
+      ? '<span class="badge badge-gold">最安</span>'
+      : `+${diff.toLocaleString()}円`;
+    const fill = Math.round((cheapest / r.monthly) * 100);
+    const tags = (r.plan.tags || []).map(t => `<span class="badge badge-blue">${t}</span>`).join('');
+    const bdRows = r.discList.map(d =>
+      `<div class="bd-row"><span class="bd-label">${d.n}</span><span class="bd-val discount">▲${d.a.toLocaleString()}円</span></div>`
+    ).join('');
+    const callRow = r.callCost && r.callCost.name
+      ? `<div class="bd-row"><span class="bd-label">${r.callCost.name}</span><span class="bd-val ${r.callCost.amt === 0 ? 'discount' : 'extra'}">${r.callCost.amt === 0 ? '無料' : '+' + r.callCost.amt.toLocaleString() + '円'}</span></div>`
+      : '';
+    const multiNote = batchState.lines > 1
+      ? `<div class="bd-row"><span class="bd-label">1回線あたり</span><span class="bd-val">${r.perLine.toLocaleString()}円</span></div>
+         <div class="bd-row"><span class="bd-label">×${batchState.lines}回線</span><span class="bd-val">${r.monthly.toLocaleString()}円</span></div>`
+      : '';
+    const planLabel = r.plan.label || r.plan.name;
+    const card = document.createElement('div');
+    card.className = `rank-card ${rankClass}`;
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="rank-badge">${emoji}</div>
+        <div class="carrier-dot" style="background:${CARRIER_COLORS[r.plan.carrier]}"></div>
+        <div>
+          <div class="carrier-label" style="color:${CARRIER_COLORS[r.plan.carrier]}">${CARRIER_NAMES[r.plan.carrier]} &nbsp;/&nbsp; <span style="font-weight:900;color:var(--text);font-size:14px">${r.plan.name}</span></div>
+          <div class="plan-name">${planLabel}${tags}</div>
+        </div>
+        <div class="price-display">
+          <div class="price-big">${r.monthly.toLocaleString()}<span class="price-unit">円</span></div>
+          <div class="price-vs">${diffStr}</div>
+        </div>
+      </div>
+      <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="background:${CARRIER_COLORS[r.plan.carrier]};width:0%" data-fill="${fill}"></div></div></div>
+      <div class="breakdown">
+        <div class="bd-row"><span class="bd-label">基本料金</span><span class="bd-val">${r.base.toLocaleString()}円</span></div>
+        ${bdRows}${callRow}${multiNote}
+        <div class="bd-total"><span>月額合計</span><span class="bd-val">${r.monthly.toLocaleString()}円</span></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:5px">${r.plan.desc}</div>
+      </div>
+      <div class="expand-hint">▼ タップで内訳を表示</div>`;
+    card.addEventListener('click', () => card.classList.toggle('open'));
+    list.appendChild(card);
+  });
+
+  showResults();
+  setTimeout(() => document.querySelectorAll('.bar-fill').forEach(b => b.style.width = b.dataset.fill + '%'), 100);
+}
+
+// ═══════════════════════════════════════════════
+// INDIVIDUAL MODE
+// ═══════════════════════════════════════════════
+let lineIdCounter = 0;
+const lineData = [];
+const LINE_COLORS = ['#3a7af4','#12b878','#e09400','#cc2222','#7b4ef0'];
+
+function switchMode(m) {
+  document.getElementById('tab-batch').classList.toggle('active', m === 'batch');
+  document.getElementById('tab-individual').classList.toggle('active', m === 'individual');
+  document.getElementById('batch-mode').style.display      = m === 'batch'      ? 'block' : 'none';
+  document.getElementById('individual-mode').style.display = m === 'individual' ? 'block' : 'none';
+  document.getElementById('results').style.display = 'none';
+  if(m === 'individual' && lineData.length === 0) { addLine(); addLine(); }
+}
+
+function addLine() {
+  if(lineData.length >= 6) return;
+  const id = ++lineIdCounter;
+  lineData.push({
+    id, name:`回線 ${id}`, planName:'ドコモ MAX', gb:10,
+    cardGrade:'none', callOpt:'none',
+    discs: { hikari:false, family:false, family3:false, denki:false, child:false }
+  });
+  renderLines();
+}
+
+function removeLine(id) {
+  const idx = lineData.findIndex(l => l.id === id);
+  if(idx >= 0) lineData.splice(idx, 1);
+  renderLines();
+}
+
+function renderLines() {
+  const container = document.getElementById('lines-container');
+  container.innerHTML = '';
+  lineData.forEach((ld, i) => {
+    const color = LINE_COLORS[i % LINE_COLORS.length];
+    const planOpts = PLANS.map(p =>
+      `<option value="${p.name}"${p.name === ld.planName ? 'selected' : ''}>${CARRIER_NAMES[p.carrier]} ▶ ${p.name}（${p.label || ''}）</option>`
+    ).join('');
+    const gbOpts = [1,3,5,10,20,30,50].map(g =>
+      `<option value="${g}"${g === ld.gb ? 'selected' : ''}>${g >= 50 ? '50GB+（無制限）' : g + 'GB'}</option>`
+    ).join('');
+    const cardOpts = [
+      {v:'none',l:'なし'}, {v:'normal',l:'ノーマル'}, {v:'gold',l:'ゴールド'}
+    ].map(o => `<option value="${o.v}"${o.v === ld.cardGrade ? 'selected' : ''}>${o.l}</option>`).join('');
+    const callOpts = [
+      {v:'none',l:'なし（従量制）'}, {v:'short',l:'5〜10分かけ放題 +880円'},
+      {v:'unlimited',l:'完全かけ放題 +1,980円'}, {v:'pack60',l:'月60分パック +660円（UQ限定）'},
+      {v:'link',l:'Rakuten Link（楽天限定）'}
+    ].map(o => `<option value="${o.v}"${o.v === ld.callOpt ? 'selected' : ''}>${o.l}</option>`).join('');
+    const discChips = DISC_OPTIONS.map(do_ =>
+      `<span class="disc-chip${ld.discs[do_.key] ? ' active' : ''}"
+             onclick="toggleLineDisc(${ld.id},'${do_.key}')"
+             title="${do_.desc}">${do_.label}</span>`
+    ).join('');
+
+    const div = document.createElement('div');
+    div.className = 'line-card';
+    div.id = `line-card-${ld.id}`;
+    div.innerHTML = `
+      <div class="line-card-header">
+        <div class="line-num-badge" style="background:${color}">${i + 1}</div>
+        <input class="line-name-input" type="text" value="${ld.name}"
+               oninput="updateLineName(${ld.id},this.value)" placeholder="回線名">
+        ${lineData.length > 1 ? `<button class="remove-line-btn" onclick="removeLine(${ld.id})">削除</button>` : ''}
+      </div>
+      <div class="line-fields">
+        <div class="field-group">
+          <div class="field-label">🔌 プラン</div>
+          <select class="field-select" onchange="updateLinePlan(${ld.id},this.value)">${planOpts}</select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">📶 データ量</div>
+          <select class="field-select" onchange="updateLineGB(${ld.id},parseInt(this.value))">${gbOpts}</select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">💳 カード</div>
+          <select class="field-select" onchange="updateLineCard(${ld.id},this.value)">${cardOpts}</select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">📞 通話オプション</div>
+          <select class="field-select" onchange="updateLineCall(${ld.id},this.value)">${callOpts}</select>
+        </div>
+      </div>
+      <div class="line-discounts">
+        <div class="disc-label">🎁 割引・条件</div>
+        <div class="disc-chips">${discChips}</div>
+      </div>`;
+    container.appendChild(div);
+  });
+  const addBtn = document.querySelector('.add-line-btn');
+  if(addBtn) addBtn.style.display = lineData.length >= 6 ? 'none' : 'block';
+}
+
+function updateLineName(id, v) { const l = lineData.find(x => x.id === id); if(l) l.name = v; }
+function updateLinePlan(id, v) { const l = lineData.find(x => x.id === id); if(l) { l.planName = v; renderLines(); } }
+function updateLineGB(id, v)   { const l = lineData.find(x => x.id === id); if(l) l.gb = v; }
+function updateLineCard(id, v) { const l = lineData.find(x => x.id === id); if(l) l.cardGrade = v; }
+function updateLineCall(id, v) { const l = lineData.find(x => x.id === id); if(l) l.callOpt = v; }
+
+function toggleLineDisc(id, k) {
+  const l = lineData.find(x => x.id === id);
+  if(!l) return;
+  l.discs[k] = !l.discs[k];
+  if(k === 'family3' && l.discs.family3) l.discs.family = true;
+  const card  = document.getElementById(`line-card-${id}`);
+  const chips = card.querySelectorAll('.disc-chip');
+  DISC_OPTIONS.forEach((do_, i) => chips[i].classList.toggle('active', l.discs[do_.key]));
+}
+
+// ── INDIVIDUAL CALC ─────────────────────────────
+function calcIndividual() {
+  if(lineData.length === 0) { alert('回線を追加してください'); return; }
+  let grandTotal = 0;
+  const lineResults = [];
+
+  lineData.forEach(ld => {
+    const plan = PLAN_MAP[ld.planName];
+    if(!plan) { lineResults.push({ name:ld.name, error:'プラン不明' }); return; }
+    const s = { ...ld.discs, gb:ld.gb, cardGrade:ld.cardGrade };
+    if(plan.maxGB > 0 && ld.gb > plan.maxGB) {
+      lineResults.push({ name:ld.name, planName:ld.planName, carrier:plan.carrier, error:`このプランは最大${plan.maxGB}GBまでです` });
+      return;
+    }
+    const base = plan.baseCalc ? plan.baseCalc(ld.gb) : plan.base;
+    if(base === null || base === undefined) {
+      lineResults.push({ name:ld.name, error:'データ量がプラン範囲外です' }); return;
+    }
+    const discList  = plan.discounts(s);
+    const totalDisc = discList.reduce((x, d) => x + d.a, 0);
+    const baseAfter = Math.max(base - totalDisc, 0);
+    const callCost  = getCallCost(plan, ld.callOpt);
+    const perLine   = baseAfter + callCost.amt;
+    grandTotal += perLine;
+    lineResults.push({ name:ld.name, plan, base, discList, callCost, perLine, error:null });
+  });
+
+  renderIndividualResults(lineResults, grandTotal);
+}
+
+function renderIndividualResults(results, total) {
+  document.getElementById('result-title').textContent    = '👥 回線別 料金内訳';
+  document.getElementById('result-subtitle').textContent = `${results.length}回線合計`;
+
+  const el = document.getElementById('result-body');
+  el.innerHTML = '';
+
+  // サマリーカード
+  const summary = document.createElement('div');
+  summary.className = 'ind-result-summary';
+  const lineRows = results.map((r, i) => {
+    if(r.error) return `<div class="ind-line-row">
+      <div><div class="ind-line-name">${r.name}</div><div class="ind-line-carrier" style="color:var(--danger)">${r.error}</div></div>
+      <div class="ind-line-price" style="color:var(--danger)">—</div></div>`;
+    const color = CARRIER_COLORS[r.plan.carrier];
+    return `<div class="ind-line-row">
+      <div><div class="ind-line-name" style="display:flex;align-items:center;gap:6px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${LINE_COLORS[i % LINE_COLORS.length]};flex-shrink:0;display:inline-block"></span>
+        ${r.name}</div>
+        <div class="ind-line-carrier" style="color:${color}">${CARRIER_NAMES[r.plan.carrier]} / ${r.plan.name}</div>
+      </div>
+      <div class="ind-line-price">${r.perLine.toLocaleString()}円</div></div>`;
+  }).join('');
+  summary.innerHTML = `
+    <div class="ind-total-row">
+      <div class="ind-total-label">月額合計（全回線）</div>
+      <div class="ind-total-price">${total.toLocaleString()}<span class="ind-total-unit">円</span></div>
+    </div>${lineRows}`;
+  el.appendChild(summary);
+
+  // 各回線の詳細カード
+  results.forEach((r, i) => {
+    if(r.error || !r.plan) return;
+    const color     = CARRIER_COLORS[r.plan.carrier];
+    const lineColor = LINE_COLORS[i % LINE_COLORS.length];
+    const card = document.createElement('div');
+    card.className = 'rank-card rank-other';
+    card.style.borderLeft = `3px solid ${lineColor}`;
+    const bdRows = r.discList.map(d =>
+      `<div class="bd-row"><span class="bd-label">${d.n}</span><span class="bd-val discount">▲${d.a.toLocaleString()}円</span></div>`
+    ).join('');
+    const callRow = r.callCost && r.callCost.name
+      ? `<div class="bd-row"><span class="bd-label">${r.callCost.name}</span><span class="bd-val ${r.callCost.amt === 0 ? 'discount' : 'extra'}">${r.callCost.amt === 0 ? '無料' : '+' + r.callCost.amt.toLocaleString() + '円'}</span></div>`
+      : '';
+    const planLabel = r.plan.label || r.plan.name;
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="carrier-dot" style="background:${lineColor}"></div>
+        <div>
+          <div class="carrier-label" style="color:${color}">${CARRIER_NAMES[r.plan.carrier]} &nbsp;/&nbsp; <span style="font-weight:900;color:var(--text);font-size:14px">${r.plan.name}</span></div>
+          <div class="plan-name">${r.name} ▶ ${planLabel}</div>
+        </div>
+        <div class="price-display"><div class="price-big">${r.perLine.toLocaleString()}<span class="price-unit">円</span></div></div>
+      </div>
+      <div class="breakdown" style="display:block">
+        <div class="bd-row"><span class="bd-label">基本料金</span><span class="bd-val">${r.base.toLocaleString()}円</span></div>
+        ${bdRows}${callRow}
+        <div class="bd-total"><span>この回線の月額</span><span class="bd-val">${r.perLine.toLocaleString()}円</span></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:5px">${r.plan.desc}</div>
+      </div>`;
+    el.appendChild(card);
+  });
+
+  showResults();
+}
+
+function showResults() {
+  const el = document.getElementById('results');
+  el.style.display = 'block';
+  el.classList.add('show');
+  el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// init
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('batch-mode').style.display      = 'block';
+  document.getElementById('individual-mode').style.display = 'none';
+  setCardGrade('none');
+});
+</script>
+</body>
+</html>
