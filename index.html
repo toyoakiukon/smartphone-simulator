@@ -645,10 +645,12 @@ const PLANS = [
 
   // ════ Y!mobile ════
   {carrier:'ymobile', name:'シンプル3 S', label:'5GB',
-   desc:'5GB / 3,278円（6/2〜）※おうち割非対象',
+   desc:'5GB / 3,278円（6/2〜）/ おうち割光セット・家族割引は排他（有利な方を自動適用）',
    base:3278, maxGB:5,
    discounts:s=>{let d=[];
-     if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     const hA=s.hikari?1650:0, fA=(s.family||s.family3)?1100:0;
+     if(s.hikari&&hA>=fA) d.push({n:'おうち割 光セット（A）',a:1650});
+     else if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
      else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
      return d;},
