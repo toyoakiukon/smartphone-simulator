@@ -562,8 +562,48 @@ const PLANS = [
    tags:['小容量','段階制']},
 
   // ════ SoftBank ════
-  {carrier:'softbank', name:'メリハリ無制限＋', label:'無制限',
-   desc:'データ無制限 / 7,425円（7月より+550円改定予定）',
+  // 2026年6月2日〜 新プラン（旧プランは6月1日で新規受付終了）
+  // PayPayカード割：ノーマル330円→187円に変更なし、ゴールド550円に強化
+
+  {carrier:'softbank', name:'テイガク無制限', label:'無制限 / Starlink Direct込み',
+   desc:'8,008円 / Starlink Direct・Fast Access・海外データ放題込み / 2026年6月2日〜',
+   base:8008, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     return d;},
+   tags:['無制限','Starlink','海外放題']},
+
+  {carrier:'softbank', name:'ペイトク2', label:'無制限 / PayPay特化',
+   desc:'10,208円 / Starlink Direct・Fast Access・海外データ放題1ヶ月込み / 2026年6月2日〜',
+   base:10208, maxGB:0,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     return d;},
+   tags:['無制限','PayPay最大+10%','Starlink']},
+
+  {carrier:'softbank', name:'ミニフィット2', label:'〜2GB / 〜5GB 段階制',
+   desc:'〜2GB:5,258円 / 〜5GB:6,358円 / 2026年6月2日〜 / Starlink Direct・海外5日間込み',
+   baseCalc:gb=>gb<=2?5258:gb<=5?6358:null, maxGB:5,
+   discounts:s=>{let d=[];
+     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:550});
+     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:330});
+     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
+     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     return d;},
+   tags:['小容量','段階制','Starlink']},
+
+  // 旧プラン（7月1日から値上げ・新規受付終了済み）
+  {carrier:'softbank', name:'メリハリ無制限＋', label:'無制限（旧プラン・7月〜+550円）',
+   desc:'7,425円（7月1日より7,975円に改定予定）/ 新規受付は6月1日終了',
    base:7425, maxGB:0,
    discounts:s=>{let d=[];
      if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
@@ -572,10 +612,10 @@ const PLANS = [
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
      else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
      return d;},
-   tags:['無制限']},
+   tags:['無制限','旧プラン']},
 
-  {carrier:'softbank', name:'ペイトク無制限', label:'無制限 / PayPay特化',
-   desc:'データ無制限・PayPayポイント還元強化 / 9,625円',
+  {carrier:'softbank', name:'ペイトク無制限', label:'無制限 / PayPay特化（旧プラン）',
+   desc:'9,625円（7月1日より10,175円に改定）/ 新規受付は6月1日終了',
    base:9625, maxGB:0,
    discounts:s=>{let d=[];
      if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
@@ -584,31 +624,7 @@ const PLANS = [
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
      else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
      return d;},
-   tags:['無制限','PayPay最大+5%']},
-
-  {carrier:'softbank', name:'ペイトク50', label:'50GB / PayPay特化',
-   desc:'50GB・PayPayポイント還元強化 / 8,525円',
-   base:8525, maxGB:50,
-   discounts:s=>{let d=[];
-     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
-     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
-     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
-     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
-     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
-     return d;},
-   tags:['50GB','PayPay最大+3%']},
-
-  {carrier:'softbank', name:'ペイトク30', label:'30GB / PayPay特化',
-   desc:'30GB・PayPayポイント還元強化 / 7,425円',
-   base:7425, maxGB:30,
-   discounts:s=>{let d=[];
-     if(s.family3) d.push({n:'新みんな家族割（3回線以上）',a:1210});
-     else if(s.family) d.push({n:'新みんな家族割（2回線）',a:660});
-     if(s.hikari) d.push({n:'おうち割 光セット',a:1100});
-     if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:187});
-     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:187});
-     return d;},
-   tags:['30GB','PayPay最大+1%']},
+   tags:['無制限','PayPay最大+5%','旧プラン']},
 
   // ════ 楽天モバイル ════
   {carrier:'rakuten', name:'Rakuten最強プラン', label:'〜3GB / 3〜20GB / 無制限 従量制',
@@ -644,15 +660,23 @@ const PLANS = [
    tags:['30GB','くりこし','5GB割引']},
 
   // ════ Y!mobile ════
+  // 2026年6月2日〜 シンプル3 S/M/L 料金改定
+  // PayPayカードゴールド: 550円+増額特典220円=770円割引（6/2〜）
+  // おうち割光セット(A)・でんきセット(E)・家族割は排他（最有利を自動選択）
+
   {carrier:'ymobile', name:'シンプル3 S', label:'5GB',
-   desc:'5GB / 3,278円（6/2〜）/ おうち割光セット・家族割引は排他（有利な方を自動適用）',
+   desc:'5GB / 3,278円（6/2〜）/ おうち割・でんきセット・家族割は排他（有利な方を自動適用）',
    base:3278, maxGB:5,
    discounts:s=>{let d=[];
-     const hA=s.hikari?1650:0, fA=(s.family||s.family3)?1100:0;
-     if(s.hikari&&hA>=fA) d.push({n:'おうち割 光セット（A）',a:1650});
-     else if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     const hA=s.hikari?1650:(s.denki?1100:0);
+     const fA=(s.family||s.family3)?1100:0;
+     if((s.hikari||s.denki)&&hA>=fA) {
+       d.push({n:s.hikari?'おうち割 光セット（A）':'おうち割 でんきセット（E）',a:hA});
+     } else if((s.family||s.family3)) {
+       d.push({n:'家族割引（副回線）',a:1100});
+     }
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
-     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）+増額特典',a:770});
      return d;},
    tags:['5GB','くりこし']},
 
@@ -660,11 +684,15 @@ const PLANS = [
    desc:'30GB / 4,378円（6/2〜）/ データくりこし対応',
    base:4378, maxGB:30,
    discounts:s=>{let d=[];
-     const hA=s.hikari?1650:0, fA=(s.family||s.family3)?1100:0;
-     if(s.hikari&&hA>=fA) d.push({n:'おうち割 光セット（A）',a:1650});
-     else if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     const hA=s.hikari?1650:(s.denki?1100:0);
+     const fA=(s.family||s.family3)?1100:0;
+     if((s.hikari||s.denki)&&hA>=fA) {
+       d.push({n:s.hikari?'おうち割 光セット（A）':'おうち割 でんきセット（E）',a:hA});
+     } else if((s.family||s.family3)) {
+       d.push({n:'家族割引（副回線）',a:1100});
+     }
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
-     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）+増額特典',a:770});
      if(s.child) d.push({n:'ワイモバ親子割',a:1100});
      return d;},
    tags:['30GB','くりこし']},
@@ -673,14 +701,18 @@ const PLANS = [
    desc:'35GB・10分かけ放題込み / 5,478円（6/2〜）/ データくりこし対応',
    base:5478, maxGB:35,
    discounts:s=>{let d=[];
-     const hA=s.hikari?1650:0, fA=(s.family||s.family3)?1100:0;
-     if(s.hikari&&hA>=fA) d.push({n:'おうち割 光セット（A）',a:1650});
-     else if(s.family||s.family3) d.push({n:'家族割引（副回線）',a:1100});
+     const hA=s.hikari?1650:(s.denki?1100:0);
+     const fA=(s.family||s.family3)?1100:0;
+     if((s.hikari||s.denki)&&hA>=fA) {
+       d.push({n:s.hikari?'おうち割 光セット（A）':'おうち割 でんきセット（E）',a:hA});
+     } else if((s.family||s.family3)) {
+       d.push({n:'家族割引（副回線）',a:1100});
+     }
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
-     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）',a:550});
+     else if(s.cardGrade==='gold') d.push({n:'PayPayカード割（ゴールド）+増額特典',a:770});
      if(s.child) d.push({n:'ワイモバ親子割',a:1100});
      return d;},
-   tags:['35GB','10分通話込','くりこし']},
+   tags:['35GB','10分通話込','くりこし']}
 ];
 
 const PLAN_MAP = {};
@@ -734,18 +766,18 @@ function setCardGrade(g) {
       '📌 ノーマルカードの割引額',
       `docomo: dカード → ${nm}▲220円${e} / GOLD・PLATINUM → ${gd}▲550円${e}（ドコモMAX・mini対象、ahamo対象外）`,
       `au: au PAYカード → ${nm}▲220円${e}`,
-      `SoftBank: PayPayカード → ${nm}▲187円${e}`,
+      `SoftBank: PayPayカード → ${nm}▲187円${e}（新プラン共通）`,
       `UQモバイル: au PAYカード → ${nm}▲220円${e}（トクトクプラン2のみ）`,
-      `Y!mobile: PayPayカード → ${nm}▲330円${e}（シンプル3）`,
+      `Y!mobile: PayPayカード → ${nm}▲330円${e}（シンプル3 S/M/L）`,
       '楽天: ポイント還元型（直接割引なし）',
     ].join('<br>'),
     gold: [
       '✨ ゴールドカードの割引額',
       `docomo: dカード GOLD/GOLD U/PLATINUM → ${gd}▲550円${e}（ドコモMAX・mini対象、ahamo対象外）`,
       `au: au PAYゴールドカード → ${nm}▲220円${e}（ノーマルと同額）`,
-      `SoftBank: PayPayカードゴールド → ${nm}▲187円${e}（ノーマルと同額）`,
+      `SoftBank: PayPayカードゴールド → ${gd}▲550円${e}（6/2〜新プランで強化）`,
       `UQモバイル: au PAYゴールド → ${nm}▲220円${e}（ノーマルと同額）`,
-      `Y!mobile: PayPayカードゴールド → ${gd}▲550円${e}（ノーマル+220円お得）`,
+      `Y!mobile: PayPayカードゴールド → ${gd}▲770円${e}（6/2〜 550円+増額特典220円）`,
       '楽天: ポイント還元型（直接割引なし）',
     ].join('<br>'),
   };
