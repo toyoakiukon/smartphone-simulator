@@ -488,7 +488,7 @@ const PLANS = [
      if(s.hikari) d.push({n:'ドコモ光セット割',a:1210});
      if(s.cardGrade==='normal') d.push({n:'dカードお支払割',a:220});
      else if(s.cardGrade==='gold') d.push({n:'dカード GOLD/PLATINUM お支払割',a:550});
-     if(s.denki&&!s.hikari) d.push({n:'ドコモでんきセット割',a:110});
+     if(s.denki) d.push({n:'ドコモでんきセット割',a:110});
      return d;},
    tags:['段階制','DAZN付帯','海外30GB']},
 
@@ -501,7 +501,7 @@ const PLANS = [
      if(s.hikari) d.push({n:'ドコモ光セット割',a:1210});
      if(s.cardGrade==='normal') d.push({n:'dカードお支払割',a:220});
      else if(s.cardGrade==='gold') d.push({n:'dカード GOLD/PLATINUM お支払割',a:550});
-     if(s.denki&&!s.hikari) d.push({n:'ドコモでんきセット割',a:110});
+     if(s.denki) d.push({n:'ドコモでんきセット割',a:110});
      return d;},
    tags:['小容量','家族割なし']},
 
@@ -670,9 +670,9 @@ const PLANS = [
    discounts:s=>{let d=[];
      const hA=s.hikari?1650:(s.denki?1100:0);
      const fA=(s.family||s.family3)?1100:0;
-     if((s.hikari||s.denki)&&hA>=fA) {
+     if(s.hikari||s.denki) {
        d.push({n:s.hikari?'おうち割 光セット（A）':'おうち割 でんきセット（E）',a:hA});
-     } else if((s.family||s.family3)) {
+     } else if(s.family||s.family3) {
        d.push({n:'家族割引（副回線）',a:1100});
      }
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
@@ -686,9 +686,9 @@ const PLANS = [
    discounts:s=>{let d=[];
      const hA=s.hikari?1650:(s.denki?1100:0);
      const fA=(s.family||s.family3)?1100:0;
-     if((s.hikari||s.denki)&&hA>=fA) {
+     if(s.hikari||s.denki) {
        d.push({n:s.hikari?'おうち割 光セット（A）':'おうち割 でんきセット（E）',a:hA});
-     } else if((s.family||s.family3)) {
+     } else if(s.family||s.family3) {
        d.push({n:'家族割引（副回線）',a:1100});
      }
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
@@ -703,9 +703,9 @@ const PLANS = [
    discounts:s=>{let d=[];
      const hA=s.hikari?1650:(s.denki?1100:0);
      const fA=(s.family||s.family3)?1100:0;
-     if((s.hikari||s.denki)&&hA>=fA) {
+     if(s.hikari||s.denki) {
        d.push({n:s.hikari?'おうち割 光セット（A）':'おうち割 でんきセット（E）',a:hA});
-     } else if((s.family||s.family3)) {
+     } else if(s.family||s.family3) {
        d.push({n:'家族割引（副回線）',a:1100});
      }
      if(s.cardGrade==='normal') d.push({n:'PayPayカード割',a:330});
